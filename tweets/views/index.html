@@ -1,0 +1,100 @@
+<html>
+	<head>
+		<meta name="HandheldFriendly" content="True">
+		<meta name="MobileOptimized" content="320">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="stylesheet" href="/public/html5reset.css" media="all">
+		<link rel="stylesheet" href="/public/responsivegridsystem.css" media="all">
+		<link rel="stylesheet" href="/public/col.css" media="all">
+		<link rel="stylesheet" href="/public/2cols.css" media="all">
+		<link rel="stylesheet" href="/public/styles.css" media="all">
+
+		<script src="/public/dustjs/dust-full.min.js"></script>
+		<script src="/public/dustjs/dust-helpers-1.1.2.js"></script>
+		<script src="/public/templates/tweets.js"></script>
+		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+		<script src="/public/jquery-dateFormat.min.js"></script>
+	</head>
+
+	<script>
+		dust.helpers.formatDate = function (chunk, context, bodies, params) {
+		    var value = dust.helpers.tap(params.value, chunk, context);
+		    return chunk.write($.format.prettyDate(value));
+		};
+
+		$(document).ready(function() {
+			$('#maincontent').on('click', '.tweet', function(e){
+				if (! $(e.target).is('a'))
+				{
+					window.open($(this).data('url'));
+				}
+			});
+
+			var screen_name = '{{screen_name}}';
+
+			$.ajax({
+				url: "/api/tweets",
+				data: {screen_name:screen_name},
+				success: function(data) {
+					//console.log(data);
+					if (data.length > 0)
+					{
+						if (typeof data[0].user != "undefined" && typeof data[0].user.name != "undefined")
+						{
+							tweeter = data[0].user.name;
+						}
+						else
+						{
+							tweeter = screen_name;
+						}
+
+						//replace urls. Couldnt do this in dust because you dont seem to be able to pass objects to helpers.
+						for (tweet in data)
+						{
+							if (typeof data[tweet].entities != "undefined" && typeof data[tweet].entities.urls != "undefined" && data[tweet].entities.urls.length > 0)
+							{
+								for (i in data[tweet].entities.urls)
+								{
+									data[tweet].text = data[tweet].text.replace(data[tweet].entities.urls[i].url, '<a href="' + data[tweet].entities.urls[i].url +'">' + data[tweet].entities.urls[i].url + '</a>');
+								}
+
+								for (i in data[tweet].entities.media)
+								{
+									if (data[tweet].entities.media[i].type == "photo")
+									{
+										data[tweet].text = data[tweet].text.replace(data[tweet].entities.media[i].url, '<img src="' + data[tweet].entities.media[i].media_url +'">');
+									}
+								}
+							}
+						}
+
+						var tweet_data = {tweeter:tweeter,tweets:data};
+
+						if (typeof data[0].user != "undefined" && typeof data[0].user.description != "undefined")
+						{
+							tweet_data.tweeter_desc = data[0].user.description;
+						}
+
+						dust.render("tweets", tweet_data, function(err, out) {
+							if(err != null)
+							{
+								alert("Error loading tweets");
+							}
+
+							$("#maincontent").html(out);
+						});
+					}
+				}
+			});
+
+
+		});
+	</script>
+
+	<body>
+		<div id="maincontentcontainer">
+			<div id="maincontent"></div>
+		</div>
+	</body>
+</html>

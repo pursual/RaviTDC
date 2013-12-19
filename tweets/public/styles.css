@@ -1,0 +1,24 @@
+.title {
+	color:black;
+}
+
+.date {
+	position: absolute;
+	bottom: 2px;
+	font-size:12px;
+}
+
+.tweet{
+	text-align:left;
+	border: 1px solid black;
+	border-radius: 5px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+	border-color: #EEEEEE #DDDDDD #BBBBBB;
+	font: 16px Georgia;
+	padding: 5px;
+	min-height:110px;
+	position: relative;
+	cursor:pointer;
+}
+
+.tweet img {max-height: 100%;max-width:100%;margin:10px 0px;}
