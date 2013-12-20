@@ -26,13 +26,18 @@ app.use(app.router);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 
-
-var t = new Twitter({
+var twitter = new Twitter({
   consumer_key: 'vEAmcUdgeSpdGiMbH1FMZw',
   consumer_secret: 'GC8j8FBIRDxiKgUwtB0idqDAmADTAF0SW7Yc7OUA',
   application_only: true
 });
 
+app.get('/', function (req, res) {
+  var screen_name = 'cnnbrk';
+  res.render('index', {
+    screen_name: screen_name
+  });
+});
 
 app.get('/:id', function (req, res) {
   var screen_name = (req.params.id === 'cnnbrk-tweets') ? 'cnnbrk' : req.params.id;
@@ -45,7 +50,7 @@ app.get('/:id', function (req, res) {
 app.get('/api/tweets', function (req, res) {
   var screen_name = req.query.screen_name;
 
-  t.get("statuses/user_timeline", {
+  twitter.get("statuses/user_timeline", {
     screen_name: screen_name,
     count: 10
   },

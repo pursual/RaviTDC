@@ -1,100 +1,90 @@
 <html>
-	<head>
-		<meta name="HandheldFriendly" content="True">
-		<meta name="MobileOptimized" content="320">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<link rel="stylesheet" href="/public/html5reset.css" media="all">
-		<link rel="stylesheet" href="/public/responsivegridsystem.css" media="all">
-		<link rel="stylesheet" href="/public/col.css" media="all">
-		<link rel="stylesheet" href="/public/2cols.css" media="all">
-		<link rel="stylesheet" href="/public/styles.css" media="all">
+<head>
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="600">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<script src="/public/dustjs/dust-full.min.js"></script>
-		<script src="/public/dustjs/dust-helpers-1.1.2.js"></script>
-		<script src="/public/templates/tweets.js"></script>
-		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-		<script src="/public/jquery-dateFormat.min.js"></script>
-	</head>
+  <link rel="stylesheet" href="/public/html5reset.css" media="all">
+  <link rel="stylesheet" href="/public/responsivegridsystem.css" media="all">
+  <link rel="stylesheet" href="/public/col.css" media="all">
+  <link rel="stylesheet" href="/public/2cols.css" media="all">
+  <link rel="stylesheet" href="/public/styles.css" media="all">
 
-	<script>
-		dust.helpers.formatDate = function (chunk, context, bodies, params) {
-		    var value = dust.helpers.tap(params.value, chunk, context);
-		    return chunk.write($.format.prettyDate(value));
-		};
+  <script src="/public/dustjs/dust-full.min.js"></script>
+  <script src="/public/dustjs/dust-helpers-1.1.2.js"></script>
+  <script src="/public/templates/tweets.js"></script>
+  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  <script src="/public/jquery-dateFormat.min.js"></script>
 
-		$(document).ready(function() {
-			$('#maincontent').on('click', '.tweet', function(e){
-				if (! $(e.target).is('a'))
-				{
-					window.open($(this).data('url'));
-				}
-			});
+  <script>
+    dust.helpers.formatDate = function (chunk, context, bodies, params) {
+      var value = dust.helpers.tap(params.value, chunk, context);
+      return chunk.write($.format.prettyDate(value));
+    };
 
-			var screen_name = '{{screen_name}}';
+    $(document).ready(function () {
+      $('#maincontent').on('click', '.tweet', function (e) {
+        if (!$(e.target).is('a')) {
+          window.open($(this).data('url'));
+        }
+      });
 
-			$.ajax({
-				url: "/api/tweets",
-				data: {screen_name:screen_name},
-				success: function(data) {
-					//console.log(data);
-					if (data.length > 0)
-					{
-						if (typeof data[0].user != "undefined" && typeof data[0].user.name != "undefined")
-						{
-							tweeter = data[0].user.name;
-						}
-						else
-						{
-							tweeter = screen_name;
-						}
+      var screen_name = '{{screen_name}}';
 
-						//replace urls. Couldnt do this in dust because you dont seem to be able to pass objects to helpers.
-						for (tweet in data)
-						{
-							if (typeof data[tweet].entities != "undefined" && typeof data[tweet].entities.urls != "undefined" && data[tweet].entities.urls.length > 0)
-							{
-								for (i in data[tweet].entities.urls)
-								{
-									data[tweet].text = data[tweet].text.replace(data[tweet].entities.urls[i].url, '<a href="' + data[tweet].entities.urls[i].url +'">' + data[tweet].entities.urls[i].url + '</a>');
-								}
+      $.ajax({
+        url: "/api/tweets",
+        data: {
+          screen_name: screen_name
+        },
+        success: function (data) {
+          //console.log(data);
+          if (data.length > 0) {
 
-								for (i in data[tweet].entities.media)
-								{
-									if (data[tweet].entities.media[i].type == "photo")
-									{
-										data[tweet].text = data[tweet].text.replace(data[tweet].entities.media[i].url, '<img src="' + data[tweet].entities.media[i].media_url +'">');
-									}
-								}
-							}
-						}
+            //replace urls. Couldnt do this in dust because you dont seem to be able to pass objects to helpers.
+            for (var tweet in data) {
+              if (data[tweet].entities.urls.length > 0) {
+                for (var i in data[tweet].entities.urls) {
+                  data[tweet].text = data[tweet].text.replace(data[tweet].entities.urls[i].url, '<a href="' + data[tweet].entities.urls[i].url + '">' + data[tweet].entities.urls[i].url + '</a>');
+                }
 
-						var tweet_data = {tweeter:tweeter,tweets:data};
+                for (var i in data[tweet].entities.media) {
+                  if (data[tweet].entities.media[i].type === "photo") {
+                    data[tweet].text = data[tweet].text.replace(data[tweet].entities.media[i].url, '<img src="' + data[tweet].entities.media[i].media_url + '">');
+                  }
+                }
+              }
+            }
 
-						if (typeof data[0].user != "undefined" && typeof data[0].user.description != "undefined")
-						{
-							tweet_data.tweeter_desc = data[0].user.description;
-						}
+            var tweet_data = {
+              tweeter: data[0].user.name,
+              tweets: data
+            };
 
-						dust.render("tweets", tweet_data, function(err, out) {
-							if(err != null)
-							{
-								alert("Error loading tweets");
-							}
+            if (typeof data[0].user !== "undefined" && typeof data[0].user.description !== "undefined") {
+              tweet_data.tweeter_desc = data[0].user.description;
+            }
 
-							$("#maincontent").html(out);
-						});
-					}
-				}
-			});
+            dust.render("tweets", tweet_data, function (err, out) {
+              if (err != null) {
+                alert("Error loading tweets");
+              }
+
+              $("#maincontent").html(out);
+            });
+          }
+        }
+      });
 
 
-		});
-	</script>
+    });
+  </script>
+</head>
 
-	<body>
-		<div id="maincontentcontainer">
-			<div id="maincontent"></div>
-		</div>
-	</body>
+<body>
+  <div id="maincontentcontainer">
+    <div id="maincontent">Loading...</div>
+  </div>
+</body>
+
 </html>
