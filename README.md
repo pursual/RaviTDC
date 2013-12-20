@@ -20,6 +20,6 @@ In a production environment I would need error handling for the ajax request. Al
 
 The node api could return less data per tweet as I am not using all fields in the UI.
 
-Images kind of screw up the two column layout, could use further styling treatment.
+Images kind of push down the two column layout, could use further styling treatment.
 
-
+This was only tested in Firefox, Chrome, and Chrome on Android KitKat.

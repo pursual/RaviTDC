@@ -37,6 +37,9 @@
         data: {
           screen_name: screen_name
         },
+        error: function () {
+            alert("Couldn't get tweets from Node?");
+        },
         success: function (data) {
           //console.log(data);
           if (data.length > 0) {
@@ -67,7 +70,7 @@
 
             dust.render("tweets", tweet_data, function (err, out) {
               if (err != null) {
-                alert("Error loading tweets");
+                alert("Error rendering tweets");
               }
 
               $("#maincontent").html(out);
