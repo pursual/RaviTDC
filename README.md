@@ -4,7 +4,9 @@ Thanks for considering me (Tony Gutierrez) for a job at Turner Broadcasting.
 
 ## Setup
 
-You should be able to npm install with the included /tweets/package.json. Then run "node app.js" in the "tweets" folder. The app runs on port 3000.
+The app is in a "tweets" folder. Go there.
+
+You should be able to "npm install" the included "package.json". Then run "node app.js". The app runs on port 3000.
 
 ## Features
 
